@@ -1,0 +1,26 @@
+.header {
+    ul {
+        padding: 0;
+        z-index: 1000;
+
+        border-bottom: 1px solid $theme-text;
+
+        a {
+            color: $black;
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            width: 100px;
+
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.1);
+                text-decoration: none;
+                transition: 0.3s;
+            }
+        }
+
+        .active-item {
+            color: $accent-color;
+        }
+    }
+}
