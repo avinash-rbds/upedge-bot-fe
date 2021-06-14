@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory, useRouteMatch, useParams } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import { red, green } from "@material-ui/core/colors";
@@ -16,6 +16,8 @@ import Modal from "@material-ui/core/Modal";
 import TextField from "@material-ui/core/TextField";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
+import { getUserDetails } from "../../../api/users";
+import { updatePoints } from "../../../api/points";
 
 const useStyles = makeStyles((theme) => ({
   link: {
@@ -113,14 +115,31 @@ export default function DashboardUsers() {
 
 function UserDetails() {
   const classes = useStyles();
+  const { id } = useParams();
+
   const [openAddPoints, setOpenAddPoints] = useState(false);
   const [openRemovePoints, setOpenRemovePoints] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState(null);
   const [snackbarError, setSnackbarError] = useState(false);
   const [points, setPoints] = useState("");
-  const history = useHistory();
-  const { path } = useRouteMatch();
+  const [currentUser, setCurrentUser] = useState({ dId: id });
+
+  useEffect(async () => {
+    try {
+      const res = await getUserDetails(id);
+      setCurrentUser({
+        score: res?.data?.user?.score,
+        userName: res?.data?.user?.userName,
+        ...currentUser,
+      });
+    } catch (err) {
+      console.log("#", err);
+      setSnackbarMessage(`Error fetching details for ${id}`);
+      setSnackbarError(true);
+      setSnackbarOpen(true);
+    }
+  }, []);
 
   const handleOpenAddPoints = () => {
     setOpenAddPoints(true);
@@ -142,14 +161,24 @@ function UserDetails() {
     setPoints("");
   };
 
-  const handleSaveAddPoints = (e) => {
+  const handleSaveAddPoints = async (e) => {
     e.preventDefault();
 
     if (isValidationError()) {
       setSnackbarOpen(true);
     } else {
       // API
-      window.location.reload();
+      try {
+        const res = await updatePoints({
+          action: "ADD",
+          dId: currentUser?.dId,
+          score: 10,
+        });
+        console.log("#add: ", res);
+      } catch (err) {
+        console.log("#err ", err);
+      }
+      // window.location.reload();
     }
   };
 
@@ -289,16 +318,18 @@ function UserDetails() {
           <CardContent className={classes.media}>
             <div className="score">
               <Typography variant="h3" component="h2">
-                50
+                {currentUser?.score !== undefined ? currentUser?.score : "N/A"}
               </Typography>
             </div>
           </CardContent>
           <CardContent>
             <Typography gutterBottom variant="h5" component="h2">
-              Name
+              {currentUser?.userName !== undefined
+                ? currentUser?.userName
+                : "N/A"}
             </Typography>
             <Typography variant="body2" color="textSecondary" component="p">
-              #77686858585756
+              #{currentUser?.dId}
             </Typography>
           </CardContent>
         </CardActionArea>
