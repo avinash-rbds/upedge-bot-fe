@@ -106,29 +106,50 @@ function UsersList() {
     <List className={classes.root}>
       {users &&
         users.length > 0 &&
-        users.map((item, index) => {
-          return (
-            <>
-              <Link
-                href={`${path}/users/${item?.dId}`}
-                style={{ textDecoration: "none" }}
-              >
-                <ListItem className={classes.item} key={index}>
-                  <ListItemAvatar>
-                    <Avatar>
-                      <ImageIcon />
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={item?.userName}
-                    secondary={`Score: ${item?.score}`}
-                  />
-                </ListItem>
-                {index < users.length - 1 && <Divider />}
-              </Link>
-            </>
-          );
-        })}
+        users
+          .sort((a, b) => {
+            // sort based on score - D.O
+            if (a.score > b.score) {
+              return -1;
+            }
+            if (a.score < b.score) {
+              return 1;
+            }
+            return 0;
+          })
+          .sort((a, b) => {
+            // sort based on name - A.O
+            if (a.userName > b.userName) {
+              return 1;
+            }
+            if (a.userName < b.userName) {
+              return -1;
+            }
+            return 0;
+          })
+          .map((item, index) => {
+            return (
+              <>
+                <Link
+                  href={`${path}/users/${item?.dId}`}
+                  style={{ textDecoration: "none" }}
+                >
+                  <ListItem className={classes.item} key={index}>
+                    <ListItemAvatar>
+                      <Avatar>
+                        <ImageIcon />
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={item?.userName}
+                      secondary={`Score: ${item?.score}`}
+                    />
+                  </ListItem>
+                  {index < users.length - 1 && <Divider />}
+                </Link>
+              </>
+            );
+          })}
 
       {users && users.length === 0 && (
         <>

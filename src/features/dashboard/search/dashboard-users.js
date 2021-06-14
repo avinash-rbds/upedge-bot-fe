@@ -172,17 +172,18 @@ function UserDetails() {
         const res = await updatePoints({
           action: "ADD",
           dId: currentUser?.dId,
-          score: 10,
+          score: points,
         });
-        console.log("#add: ", res);
+        window.location.reload();
       } catch (err) {
-        console.log("#err ", err);
+        setSnackbarError(true);
+        setSnackbarOpen(true);
+        setSnackbarMessage("Error adding points");
       }
-      // window.location.reload();
     }
   };
 
-  const handleSaveRemovePoints = (e) => {
+  const handleSaveRemovePoints = async (e) => {
     e.preventDefault();
 
     if (isValidationError()) {
@@ -190,7 +191,18 @@ function UserDetails() {
       setSnackbarOpen(true);
     } else {
       // API
-      window.location.reload();
+      try {
+        const res = await updatePoints({
+          action: null,
+          dId: currentUser?.dId,
+          score: points,
+        });
+        window.location.reload();
+      } catch (err) {
+        setSnackbarError(true);
+        setSnackbarOpen(true);
+        setSnackbarMessage("Error removing points");
+      }
     }
   };
 
